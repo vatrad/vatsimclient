@@ -1,0 +1,6 @@
+<component name="CopyrightManager">
+  <copyright>
+    <option name="notice" value="This file is part of a VATRadar package.&#10;&#10;Copyright (c) &amp;#36;originalComment.match(&quot;Copyright \(c\) (\d+)&quot;, 1, &quot;-&quot;, &quot;&amp;#36;today.year&quot;)&amp;#36;today.year VATRadar &lt;dev@vatradar.net&gt; &#10; &#10;For the full copyright and license information, please view the LICENSE file that was distributed with this source code." />
+    <option name="myName" value="VATRadar" />
+  </copyright>
+</component>
