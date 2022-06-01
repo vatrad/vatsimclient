@@ -1,0 +1,35 @@
+{
+    "name": "vatradar/vatsimclient",
+    "description": "VATSIM Data Retriever",
+    "type": "library",
+    "license": "LGPL-3.0",
+    "autoload": {
+        "psr-4": {
+            "Vatradar\\Vatsimclient\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "VATRadar Devs",
+            "email": "dev@vatradar.net"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^7.4",
+        "aura/filter": "^2.3"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^1.6",
+        "phpunit/phpunit": "^9.5",
+        "phpstan/phpstan-deprecation-rules": "^1.0",
+        "phpstan/extension-installer": "^1.1",
+        "phpstan/phpstan-strict-rules": "^1.2",
+        "spaze/phpstan-disallowed-calls": "^2.3",
+        "psy/psysh": "^0.11.4"
+    },
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
+    }
+}
