@@ -1,6 +1,6 @@
 # VATSIM Client
 
-This module retrieves JSON data from VATSIM, does basic sanitization, and provides output in the form of an associative array.
+This module retrieves JSON data from VATSIM, does basic sanitization, and provides output in the form of a value object or raw JSON.
 
 ## Quick Start
 
@@ -17,15 +17,15 @@ require '/path/to/vendor/autoload.php';
 // set up Guzzle client
 $guzzle = new GuzzleClient();
 
-// Set up Filters
-$filterFactory = new FilterFactory();
-$filter = new DataFilter($filterFactory);
-
 // Instantiate VATSIM Client
-$client = new VatsimClient($guzzle, $filter, ['bootUri' => 'https://status.vatsim.net/status.json']);
+$client = new VatsimClient($guzzle, ['bootUri' => 'https://status.vatsim.net/status.json']);
 $client->bootstrap();
 
 // Retrieve data from VATSIM
-// Returned in an associative array
+// Returned in a VatsimData value object
 $data = $client->retrieve();
+
+// Retrieve data from VATSIM
+// Returned as raw JSON
+$data = $client->retrieve(true);
 ```
