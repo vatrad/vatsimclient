@@ -16,7 +16,6 @@
     ],
     "require": {
         "guzzlehttp/guzzle": "^7.5",
-        "aura/filter": "^2.3",
         "cuyz/valinor": "^0.14"
     },
     "require-dev": {
