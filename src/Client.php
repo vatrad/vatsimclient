@@ -9,21 +9,22 @@
 
 namespace Vatradar\Vatsimclient;
 
-use Aura\Filter\Exception\FilterFailed;
+use CuyZ\Valinor\Mapper\MappingError;
+use CuyZ\Valinor\Mapper\Source\Source;
+use CuyZ\Valinor\MapperBuilder;
 use Exception;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
 use JsonException;
 use RuntimeException;
-use stdClass;
+use Vatradar\Vatsimclient\Data\VatsimData;
 use Vatradar\Vatsimclient\Exception\HttpException;
 use Vatradar\Vatsimclient\Exception\MalformedJsonException;
 
 class Client
 {
     protected GuzzleClient $guzzle;
-    protected DataFilter $filter;
     /** @var string[] */
     protected array $options = [];
     /** @var string[]  */
@@ -31,18 +32,14 @@ class Client
         'version' => 'v3',
         'serializer' => 'json',
     ];
-    protected array $rawData = [];
-    protected array $filteredData = [];
 
     /**
      * @param GuzzleClient $guzzle
-     * @param DataFilter $filter
      * @param array $options
      */
-    public function __construct(GuzzleClient $guzzle, DataFilter $filter, array $options = [])
+    public function __construct(GuzzleClient $guzzle, array $options = [])
     {
         $this->guzzle = $guzzle;
-        $this->filter = $filter;
         $this->setOptions($options);
     }
 
@@ -92,19 +89,25 @@ class Client
 
     /**
      * @param string $uri
-     * @return array
+     * @param bool $raw
+     * @return array|string
      * @throws HttpException
      * @throws MalformedJsonException
      */
-    protected function guzzleRequest(string $uri): array
+    protected function guzzleRequest(string $uri, bool $raw = false): array|string
     {
         try {
-            return json_decode(
-            (string)$this->guzzle->request('GET', $uri)->getBody(),
-            true,
-            512,
-            JSON_THROW_ON_ERROR
-            );
+            $jsonBody = (string) $this->guzzle->request('GET', $uri)->getBody();
+
+            // ensure it is good json first
+            $jsonArray = json_decode($jsonBody, true, 512, JSON_THROW_ON_ERROR);
+
+            if($raw === true) {
+                return $jsonBody;
+            }
+
+            return $jsonArray;
+
         } catch (GuzzleException $e) {
             throw new HttpException('Error getting VATSIM bootstrap: '.$e->getMessage());
         } catch (JsonException $e) {
@@ -127,7 +130,7 @@ class Client
         $bootUri = $this->getOption('bootUri');
         $ver = $this->getOption('version');
 
-        /** @var stdClass $status */
+        /** @var array $status */
         $status = $this->guzzleRequest($bootUri);
 
         /** @var ?string[] $returnedUris */
@@ -135,13 +138,13 @@ class Client
 
         if(!is_array($returnedUris))
         {
-            throw new RuntimeException("Invalid data received from VATSIM status.json");
+            throw new RuntimeException('Invalid data received from VATSIM status.json');
         }
 
         try {
             $chooser = random_int(0, count($returnedUris) - 1);
         } catch (Exception $e) {
-            throw new RuntimeException("No suitable randomizer exists on your platform (".$e->getMessage().")");
+            throw new RuntimeException('No suitable randomizer exists on your platform (' .$e->getMessage(). ')');
         }
 
         $dataUri = $status['data'][$ver][$chooser];
@@ -150,34 +153,33 @@ class Client
     }
 
     /**
-     * @param bool $filtered
-     * @return array
+     * @param bool $raw
+     * @return VatsimData|string
      * @throws HttpException
      * @throws MalformedJsonException
-     * @throws FilterFailed
+     * @throws MappingError
      */
-    public function retrieve(bool $filtered = true): array
+    public function retrieve(bool $raw = false): VatsimData|string
     {
         if(!$this->hasOption('dataUri'))
         {
-            throw new RuntimeException("No Data URI defined, please bootstrap().");
+            throw new RuntimeException('No Data URI defined, please bootstrap().');
         }
 
-        $vatsim = $this->guzzleRequest($this->getOption('dataUri'));
+        $json = $this->guzzleRequest($this->getOption('dataUri'), true);
 
-        // save raw data, then save filtered data
-        $this->rawData = $vatsim;
-
-        // filter and save filtered data
-        $this->filter->run($vatsim);
-        $this->filteredData = $vatsim;
-
-        if($filtered === false) {
-            return $this->rawData;
+        if($raw === true) {
+            return $json;
         }
 
-        return $this->filteredData;
+        return (new MapperBuilder())
+            ->supportDateFormats('Y-m-d\TH:i:s+')
+            ->flexible()
+            ->mapper()
+            ->map(
+              VatsimData::class,
+              Source::json($json)->camelCaseKeys()
+            );
     }
-
 
 }
