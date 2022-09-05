@@ -7,10 +7,8 @@ This module retrieves JSON data from VATSIM, does basic sanitization, and provid
 ```php
 <?php
 
-use Aura\Filter\FilterFactory;
 use GuzzleHttp\Client as GuzzleClient;
 use Vatradar\Vatsimclient\Client as VatsimClient;
-use Vatradar\Vatsimclient\DataFilter;
 
 require '/path/to/vendor/autoload.php';
 

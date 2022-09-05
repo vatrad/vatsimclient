@@ -17,7 +17,7 @@ final class General
         public readonly int $version,
         public readonly int $reload,
         public readonly string $update,
-        public readonly string $updateTimestamp,
+        public readonly DateTimeImmutable $updateTimestamp,
         public readonly int $connectedClients,
         public readonly int $uniqueUsers,
 
