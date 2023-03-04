@@ -1,0 +1,9 @@
+## Project
+.idea/
+.env
+
+### Composer template
+composer.phar
+/vendor/
+/vbin/.gitkeep
+!/vbin/.gitkeep
