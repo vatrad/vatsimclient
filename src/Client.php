@@ -28,7 +28,9 @@ use Vatradar\Vatsimclient\Exception\MalformedJsonException;
 use Vatradar\Vatsimclient\Exception\ObjectMappingException;
 
 use function array_key_exists;
+use function htmlentities;
 use function is_array;
+use function is_string;
 use function json_decode;
 
 use const JSON_THROW_ON_ERROR;
@@ -181,6 +183,8 @@ class Client
             return $json;
         }
 
+        $filtered = $this->filter(Source::json($json)->camelCaseKeys());
+
         try {
             return (new MapperBuilder())
                 ->supportDateFormats('Y-m-d\TH:i:s+')
@@ -188,11 +192,32 @@ class Client
                 ->mapper()
                 ->map(
                     VatsimData::class,
-                    Source::json($json)->camelCaseKeys()
+                    $filtered
                 );
         } catch(MappingError $e) {
             $messages = Messages::flattenFromNode($e->node());
             throw new ObjectMappingException($messages->errors());
         }
     }
+
+    protected function filter(iterable $json): array
+    {
+        $result = [];
+
+        foreach ($json as $k => $v) {
+            if (is_iterable($v)) {
+                $result[$k] = $this->filter($v);
+                continue;
+            }
+
+            if (is_string($v)) {
+                $result[$k] = htmlentities($v);
+                continue;
+            }
+
+            $result[$k] = $v;
+        }
+        return $result;
+    }
+
 }
