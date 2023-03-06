@@ -1,7 +1,8 @@
 <?php
+
 declare(strict_types=1);
 
-namespace Vatradar\Vatsimclient\Exception;
+namespace VatRadar\VatsimClient\Exception;
 
 use CuyZ\Valinor\Mapper\Tree\Message\Messages;
 use RuntimeException;

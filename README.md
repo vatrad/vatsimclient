@@ -7,23 +7,21 @@ This module retrieves JSON data from VATSIM, does basic sanitization, and provid
 ```php
 <?php
 
-use GuzzleHttp\Client as GuzzleClient;
-use Vatradar\Vatsimclient\Client as VatsimClient;
+require __DIR__.'/vendor/autoload.php';
 
-require '/path/to/vendor/autoload.php';
+use CuyZ\Valinor\MapperBuilder;
+use GuzzleHttp\Client as HttpClient;
+use Vatradar\Dataobjects\Vatsim\VatsimData;
+use VatRadar\VatsimClient\DataFetcher;
+use VatRadar\VatsimClient\IterableSanitizer;
+use VatRadar\VatsimClient\Mapper;
 
-// set up Guzzle client
-$guzzle = new GuzzleClient();
+// Set up Dependencies
+$fetcher = new DataFetcher(new HttpClient(), 'https://status.vatsim.net/status.json');
+$sanitizer = new IterableSanitizer();
+$mapper = new Mapper(new MapperBuilder(), VatsimData::class);
 
-// Instantiate VATSIM Client
-$client = new VatsimClient($guzzle, ['bootUri' => 'https://status.vatsim.net/status.json']);
-$client->bootstrap();
+$client = new \VatRadar\VatsimClient\Client($fetcher, $sanitizer, $mapper);
 
-// Retrieve data from VATSIM
-// Returned in a VatsimData value object
-$data = $client->retrieve();
-
-// Retrieve data from VATSIM
-// Returned as raw JSON
-$data = $client->retrieve(true);
+$vatsimDataObject = $client->retrieve();
 ```
