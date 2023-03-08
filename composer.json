@@ -16,6 +16,11 @@
             "VatRadar\\VatsimClient\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\VatsimClient": "tests/"
+        }
+    },
     "require": {
         "guzzlehttp/guzzle": "^7.5",
         "cuyz/valinor": "^1.0",
