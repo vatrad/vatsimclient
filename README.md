@@ -11,7 +11,7 @@ require __DIR__.'/vendor/autoload.php';
 
 use CuyZ\Valinor\MapperBuilder;
 use GuzzleHttp\Client as HttpClient;
-use Vatradar\Dataobjects\Vatsim\VatsimData;
+use VatRadar\DataObjects\Vatsim\VatsimData;
 use VatRadar\VatsimClient\DataFetcher;
 use VatRadar\VatsimClient\IterableSanitizer;
 use VatRadar\VatsimClient\Mapper;
